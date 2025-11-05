@@ -38,7 +38,7 @@ app.post("/create-pix", async (req, res) => {
     const payload = {
       amount,
       external_id: `checkout_${Date.now()}`,
-      clientCallbackUrl: "https://snapless-amiya-unmaidenlike.ngrok-free.dev/instapay-webhook",
+      clientCallbackUrl: "https://checkout-pix-backend.onrender.com/instapay-webhook",
       payer: {
         name,
         email,
@@ -132,3 +132,4 @@ app.get("/check-payment-local/:transactionId", (req, res) => {
 
 
 app.listen(3000, () => console.log("✅ Servidor rodando em http://localhost:3000"));
+
