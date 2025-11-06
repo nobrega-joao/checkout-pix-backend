@@ -4,7 +4,11 @@ import cors from "cors";
 
 const app = express();
 const webhookStatusStore = {};
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: ["https://vozdobem.info", "https://www.vozdobem.info"],
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 app.use(express.json());
 
 // ✅ Credenciais da sua conta Instapay
@@ -133,6 +137,7 @@ app.get("/check-payment-local/:transactionId", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("✅ Servidor rodando na porta " + PORT));
+
 
 
 
