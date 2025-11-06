@@ -38,7 +38,7 @@ app.post("/create-pix", async (req, res) => {
     const payload = {
       amount,
       external_id: `checkout_${Date.now()}`,
-      clientCallbackUrl: "http://168.231.93.218:3000/instapay-webhook",
+      clientCallbackUrl: "https://api.vozdobem.info/instapay-webhook",
       payer: {
         name,
         email,
@@ -133,6 +133,7 @@ app.get("/check-payment-local/:transactionId", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("✅ Servidor rodando na porta " + PORT));
+
 
 
 
