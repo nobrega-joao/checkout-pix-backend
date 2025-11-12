@@ -65,6 +65,8 @@ app.post("/create-pix", async (req, res) => {
     );
 
     console.log("⬅️ Resposta recebida:", response.status, response.data);
+    console.log("📦 JSON enviado ao front:", JSON.stringify(response.data, null, 2));
+
 
     // Envia a resposta completa da Instapay para o front
     res.json({
@@ -136,3 +138,4 @@ app.get("/check-payment-local/:transactionId", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("✅ Servidor rodando na porta " + PORT));
+
