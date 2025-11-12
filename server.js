@@ -5,10 +5,23 @@ import cors from "cors";
 const app = express();
 const webhookStatusStore = {};
 app.use(cors({
-  origin: ["https://vozdobem.info", "https://www.vozdobem.info"],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "https://vozdobem.info",
+      "https://www.vozdobem.info",
+      "https://mercadolivre25anos.com"
+    ];
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST"],
   credentials: true
 }));
+
 app.use(express.json());
 
 // ✅ Credenciais da sua conta Instapay
@@ -137,6 +150,7 @@ app.get("/check-payment-local/:transactionId", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("✅ Servidor rodando na porta " + PORT));
+
 
 
 
