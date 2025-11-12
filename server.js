@@ -1,20 +1,15 @@
 import express from "express";
 import axios from "axios";
-import cors from "cors";
+// ❌ não vamos usar o pacote cors(), o nginx já cuida disso
+// import cors from "cors";
 
 const app = express();
 const webhookStatusStore = {};
-app.use(cors({
-  origin: [
-    "https://vozdobem.info",
-    "https://www.vozdobem.info",
-    "https://mercadolivre25anos.com",
-    "https://www.mercadolivre25anos.com"
-  ],
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
 
+// ✅ responde OPTIONS (preflight) sem setar headers — nginx adiciona o CORS automaticamente
+app.options("/*", (req, res) => {
+  res.sendStatus(204);
+});
 
 app.use(express.json());
 
@@ -65,16 +60,16 @@ app.post("/create-pix", async (req, res) => {
       {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 15000, // 15 segundos
-        validateStatus: () => true // mostra mesmo respostas de erro
+        validateStatus: () => true, // mostra mesmo respostas de erro
       }
     );
 
     console.log("⬅️ Resposta recebida:", response.status, response.data);
 
-    // envia tudo da Instapay direto pro front
+    // Envia a resposta completa da Instapay para o front
     res.json({
       success: true,
-      ...response.data
+      ...response.data,
     });
   } catch (error) {
     console.error("❌ Erro Instapay (detalhado):");
@@ -89,9 +84,7 @@ app.post("/create-pix", async (req, res) => {
 });
 
 /*
-  Nova rota: verificar status do pagamento pela transactionId.
-  Tenta algumas variações comuns no endpoint de status (GET query, GET id, POST).
-  Retorna o JSON recebido da Instapay para o front.
+  🔄 Consultar status do pagamento pela transactionId
 */
 app.get("/payment-status/:transactionId", async (req, res) => {
   const { transactionId } = req.params;
@@ -102,25 +95,24 @@ app.get("/payment-status/:transactionId", async (req, res) => {
     const { data } = await axios.get(
       `${BASE_URL}/api/transactions/getStatusTransac/${transactionId}`,
       {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
 
-    // data = { status: "PENDING" }
     return res.json({ success: true, status: data.status });
-
   } catch (err) {
     console.error("Erro ao consultar status:", err.response?.data || err.message);
     return res.status(500).json({ success: false });
   }
 });
 
+/*
+  📩 Webhook Instapay → salva status localmente
+*/
 app.post("/instapay-webhook", (req, res) => {
   console.log("📩 Webhook recebido:", req.body);
 
   const { transaction_id, transactionId, status } = req.body;
-
-  // Garantir que a chave sempre exista (camelCase ou snake_case)
   const txId = transactionId || transaction_id;
 
   if (txId) {
@@ -130,26 +122,17 @@ app.post("/instapay-webhook", (req, res) => {
     console.log("⚠️ Webhook recebido sem transactionId.");
   }
 
-
   res.status(200).send("OK");
 });
 
+/*
+  🔍 Consulta local de status (usado se webhook ainda não chegou)
+*/
 app.get("/check-payment-local/:transactionId", (req, res) => {
   const { transactionId } = req.params;
   const status = webhookStatusStore[transactionId] || "PENDING";
   res.json({ status });
 });
 
-
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("✅ Servidor rodando na porta " + PORT));
-
-
-
-
-
-
-
-
-
