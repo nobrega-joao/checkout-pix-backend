@@ -14,8 +14,8 @@ app.options("/*", (req, res) => {
 app.use(express.json());
 
 // ✅ Credenciais da sua conta Instapay
-const CLIENT_ID = "pabloguilhermeandradedossantos_488FDE45";
-const CLIENT_SECRET = "a1a919ef46836d37415a97431d60b97b0c0bfc751b4a9d088bbcb6b6fc7b42053ccc5ff6062350733949e700f2242f380d33";
+const CLIENT_ID = "pabloguilhermeandradedossantos_6A685C0B";
+const CLIENT_SECRET = "38988dc61829a228cfc048dccd7ac5d48f7633d563cc585a5793af5d00618fc8f77aa1133592ebd8de02dfba397c5954ebac";
 
 // ✅ Base URL oficial
 const BASE_URL = "https://api.instapaybr.com";
@@ -138,5 +138,6 @@ app.get("/check-payment-local/:transactionId", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("✅ Servidor rodando na porta " + PORT));
+
 
 
